@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
+import { getImageUrl } from '../../utils/imageUrl';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Plus, Edit2, Tag, EyeOff, Eye } from 'lucide-react';
 
@@ -165,7 +166,7 @@ export const CatalogDashboard = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {product.image ? (
-                        <img src={product.image} alt={product.name} className="w-10 h-10 rounded-lg object-cover bg-zinc-800" />
+                        <img src={getImageUrl(product.image)} alt={product.name} className="w-10 h-10 rounded-lg object-cover bg-zinc-800" />
                       ) : (
                         <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-lg">🍔</div>
                       )}
@@ -286,7 +287,7 @@ export const CatalogDashboard = () => {
                 <label className="block text-zinc-400 text-sm font-medium mb-2">Imagen del Producto (Opcional)</label>
                 <div className="flex items-center gap-4">
                   {formData.image && (
-                    <img src={formData.image} alt="Preview" className="w-16 h-16 rounded-xl object-cover bg-zinc-800 shrink-0" />
+                    <img src={getImageUrl(formData.image)} alt="Preview" className="w-16 h-16 rounded-xl object-cover bg-zinc-800 shrink-0" />
                   )}
                   <label className="flex-1 cursor-pointer">
                     <div className="w-full bg-zinc-950 border border-dashed border-zinc-700 hover:border-amber-500 hover:bg-amber-500/5 text-zinc-400 rounded-xl px-4 py-4 flex flex-col items-center justify-center transition-all">

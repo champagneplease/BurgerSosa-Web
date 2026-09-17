@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, Minus } from 'lucide-react';
+import { getImageUrl } from '../../utils/imageUrl';
 import { useCartStore } from '../../store/useCartStore';
 import type { Product, Modifier } from '../../store/useCartStore';
 
@@ -74,11 +75,13 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
         </button>
 
         <div className="w-full h-48 bg-gradient-to-tr from-amber-500 to-orange-400 relative">
-          {product.image ? (
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover mix-blend-overlay opacity-50" />
-          ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
+            {product.image ? (
+              <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover mix-blend-overlay opacity-50" />
+            ) : (
              <div className="w-full h-full flex items-center justify-center text-4xl">🍔</div>
-          )}
+            )}
+          </div>
           <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-zinc-900 to-transparent">
              <h2 className="text-2xl font-bold text-white">{product.name}</h2>
              <p className="text-zinc-300 font-medium">${Number(product.price).toLocaleString('es-AR')}</p>

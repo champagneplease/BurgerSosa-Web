@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Product } from '../../store/useCartStore';
+import { getImageUrl } from '../../utils/imageUrl';
 
 interface ProductCardProps {
   product: Product;
@@ -15,7 +16,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) =>
       <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="w-28 h-28 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 flex-shrink-0 flex items-center justify-center overflow-hidden relative z-10 shadow-inner border border-white/5">
         {product.image ? (
-           <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+           <img src={getImageUrl(product.image)} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
         ) : (
            <span className="text-4xl group-hover:scale-110 transition-transform duration-300">🍔</span>
         )}
