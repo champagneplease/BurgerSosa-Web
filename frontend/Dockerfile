@@ -25,11 +25,12 @@ FROM nginx:alpine
 # Copy the build output to replace the default nginx contents
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy the custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ENV PORT=80
 
-# Expose port 80
-EXPOSE 80
+# Copy the Nginx configuration template (Nginx Alpine will auto-replace ${PORT})
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+# We don't use EXPOSE because Railway uses the PORT env variable dynamically
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
