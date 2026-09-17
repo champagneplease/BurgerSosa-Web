@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(EMPLOYEE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stockMovements StockMovement[]
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  image       String?
+  isActive    Boolean  @default(true)
+  categoryId  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category   Category     @relation(fields: [categoryId], references: [id])
+  recipe     RecipeItem[]
+  modifiers  Modifier[]
+  orderItems OrderItem[]
+}
+
+model Modifier {
+  id        Int     @id @default(autoincrement())
+  name      String
+  price     Decimal @default(0) @db.Decimal(10, 2)
+  productId Int
+  isActive  Boolean @default(true)
+
+  product     Product              @relation(fields: [productId], references: [id])
+  ingredients ModifierIngredient[]
+  orderItems  OrderItemModifier[]
+}
+
+model Ingredient {
+  id           Int     @id @default(autoincrement())
+  name         String
+  unit         String // e.g. 'unidades', 'gramos', 'mililitros'
+  currentStock Float   @default(0)
+  minStock     Float   @default(0)
+  isActive     Boolean @default(true)
+
+  recipeItems         RecipeItem[]
+  modifierIngredients ModifierIngredient[]
+  stockMovements      StockMovement[]
+}
+
+model RecipeItem {
+  id           Int   @id @default(autoincrement())
+  productId    Int
+  ingredientId Int
+  quantity     Float // how much of the ingredient is consumed
+
+  product    Product    @relation(fields: [productId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@unique([productId, ingredientId])
+}
+
+model ModifierIngredient {
+  id           Int   @id @default(autoincrement())
+  modifierId   Int
+  ingredientId Int
+  quantity     Float // can be positive (subtracts more) or negative (adds back to stock)
+
+  modifier   Modifier   @relation(fields: [modifierId], references: [id])
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@unique([modifierId, ingredientId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderType {
+  DELIVERY
+  PICKUP
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  orderNumber     String      @unique
+  customerName    String
+  customerPhone   String
+  customerAddress String?
+  type            OrderType
+  status          OrderStatus @default(PENDING)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  deliveryCost    Decimal     @default(0) @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
+  paymentMethod   String?
+  paymentStatus   String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id                Int     @id @default(autoincrement())
+  orderId           Int
+  productId         Int
+  quantity          Int
+  unitPriceCaptured Decimal @db.Decimal(10, 2) // price at the time of order
+  notes             String?
+
+  order     Order               @relation(fields: [orderId], references: [id])
+  product   Product             @relation(fields: [productId], references: [id])
+  modifiers OrderItemModifier[]
+}
+
+model OrderItemModifier {
+  id                Int     @id @default(autoincrement())
+  orderItemId       Int
+  modifierId        Int
+  unitPriceCaptured Decimal @default(0) @db.Decimal(10, 2)
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id])
+  modifier  Modifier  @relation(fields: [modifierId], references: [id])
+}
+
+enum MovementType {
+  PURCHASE
+  SALE
+  WASTE
+  ADJUSTMENT
+  RETURN
+}
+
+model StockMovement {
+  id           Int          @id @default(autoincrement())
+  ingredientId Int
+  quantity     Float // positive for adding stock, negative for removing
+  type         MovementType
+  reason       String?
+  userId       Int?
+  referenceId  Int? // e.g. orderId if it was a SALE
+  createdAt    DateTime     @default(now())
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+  user       User?      @relation(fields: [userId], references: [id])
+}
+
+model StoreSettings {
+  id             Int      @id @default(1)
+  storeIsOpen    Boolean  @default(true)
+  scheduleDays   String   @default("1,2,3,4,5,6") // Comma separated days, 0=Sun, 1=Mon, etc.
+  openTime       String   @default("20:00")
+  closeTime      String   @default("00:00")
+  closedMessage  String   @default("Hoy no abrimos, los esperamos en nuestro próximo día hábil con las mejores hamburguesas del Valle.")
+  whatsappNumber String   @default("5493834974026")
+  deliveryCost   Decimal  @default(500) @db.Decimal(10, 2)
+  updatedAt      DateTime @updatedAt
+}
