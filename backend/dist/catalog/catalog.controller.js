@@ -42,6 +42,15 @@ let CatalogController = class CatalogController {
     async deleteProduct(id) {
         return this.catalogService.deleteProduct(id);
     }
+    async createCategory(data) {
+        return this.catalogService.createCategory(data);
+    }
+    async updateCategory(id, data) {
+        return this.catalogService.updateCategory(id, data);
+    }
+    async deleteCategory(id) {
+        return this.catalogService.deleteCategory(id);
+    }
     async uploadImage(file) {
         if (!file) {
             throw new common_1.BadRequestException('No file uploaded');
@@ -92,6 +101,34 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], CatalogController.prototype, "deleteProduct", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, common_1.Post)('categories'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], CatalogController.prototype, "createCategory", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, common_1.Patch)('categories/:id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], CatalogController.prototype, "updateCategory", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    (0, common_1.Delete)('categories/:id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], CatalogController.prototype, "deleteCategory", null);
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),

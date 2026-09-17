@@ -24,7 +24,7 @@ exports.AuthModule = AuthModule = __decorate([
             users_module_1.UsersModule,
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             jwt_1.JwtModule.register({
-                secret: 'SUPER_SECRET_KEY_BURGERSOSA',
+                secret: process.env.JWT_SECRET || 'secretkey_para_desarrollo_cambiar_en_produccion',
                 signOptions: { expiresIn: '1d' },
             }),
         ],

@@ -20,6 +20,10 @@ export class OrdersService {
     const orderItems = [];
 
     for (const item of data.items) {
+      if (item.quantity > 6) {
+        throw new BadRequestException(`No se permiten más de 6 unidades por producto`);
+      }
+
       const product = await this.prisma.product.findUnique({
         where: { id: item.productId }
       });
@@ -28,9 +32,16 @@ export class OrdersService {
       let productBasePrice = Number(product.price);
       let itemModifiersCost = 0;
       const modifierConnections = [];
+      const modifierCounts = new Map<number, number>();
 
       if (item.modifiers && item.modifiers.length > 0) {
         for (const modId of item.modifiers) {
+          const currentCount = (modifierCounts.get(modId) || 0) + 1;
+          if (currentCount > 6) {
+            throw new BadRequestException(`No se permiten más de 6 extras del mismo tipo`);
+          }
+          modifierCounts.set(modId, currentCount);
+
           const modifier = await this.prisma.modifier.findUnique({
             where: { id: modId }
           });

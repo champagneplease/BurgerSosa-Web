@@ -17,17 +17,21 @@ let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
     }
-    getHello() {
-        return this.appService.getHello();
+    checkHealth() {
+        return {
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            service: 'BurgerSosa API'
+        };
     }
 };
 exports.AppController = AppController;
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('health'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", String)
-], AppController.prototype, "getHello", null);
+    __metadata("design:returntype", void 0)
+], AppController.prototype, "checkHealth", null);
 exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [app_service_js_1.AppService])

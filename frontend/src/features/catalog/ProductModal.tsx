@@ -16,7 +16,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
   const addItem = useCartStore((state) => state.addItem);
 
   const incrementModifier = (modId: number) => {
-    setModifierCounts(prev => ({ ...prev, [modId]: (prev[modId] || 0) + 1 }));
+    setModifierCounts(prev => {
+      const current = prev[modId] || 0;
+      if (current >= 6) return prev;
+      return { ...prev, [modId]: current + 1 };
+    });
   };
 
   const decrementModifier = (modId: number) => {
@@ -28,6 +32,18 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
         return next;
       }
       return { ...prev, [modId]: current - 1 };
+    });
+  };
+
+  const toggleModifier = (modId: number) => {
+    setModifierCounts(prev => {
+      const next = { ...prev };
+      if (next[modId]) {
+        delete next[modId];
+      } else {
+        next[modId] = 1;
+      }
+      return next;
     });
   };
 
@@ -100,7 +116,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
                    const isSelected = count > 0;
                    const price = Number(mod.price);
                    return (
-                     <div key={mod.id} onClick={() => count === 0 && incrementModifier(mod.id)} className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-amber-500 bg-amber-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}>
+                     <div 
+                       key={mod.id} 
+                       onClick={() => {
+                         if (price === 0) {
+                           toggleModifier(mod.id);
+                         } else if (count === 0) {
+                           incrementModifier(mod.id);
+                         }
+                       }} 
+                       className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-amber-500 bg-amber-500/10' : 'border-zinc-800 hover:border-zinc-700'}`}
+                     >
                        <div className="flex items-center gap-3">
                          <div className={`w-5 h-5 rounded flex items-center justify-center border ${isSelected ? 'bg-amber-500 border-amber-500' : 'border-zinc-600'}`}>
                            {isSelected && <div className="w-2.5 h-2.5 bg-white rounded-sm" />}
@@ -111,7 +137,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
                          </div>
                        </div>
                        
-                       {isSelected && (
+                       {isSelected && price > 0 && (
                          <div className="flex items-center gap-3 bg-zinc-900 rounded-lg p-1 border border-zinc-800" onClick={(e) => e.stopPropagation()}>
                            <button onClick={(e) => { e.stopPropagation(); decrementModifier(mod.id); }} className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 transition-colors">
                              <Minus size={14} />
@@ -144,7 +170,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
             <div className="flex items-center gap-4 bg-zinc-800 rounded-full p-1">
               <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 rounded-full hover:bg-zinc-700 text-white transition-colors"><Minus size={16} /></button>
               <span className="text-white font-semibold w-4 text-center">{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)} className="p-2 rounded-full hover:bg-zinc-700 text-white transition-colors"><Plus size={16} /></button>
+              <button onClick={() => setQuantity(quantity < 6 ? quantity + 1 : 6)} className="p-2 rounded-full hover:bg-zinc-700 text-white transition-colors"><Plus size={16} /></button>
             </div>
           </div>
         </div>

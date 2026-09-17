@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
   
-  const hashedPassword = await bcrypt.hash('hashedpassword123', 10);
+  const hashedPassword = await bcrypt.hash('burgersosa24', 10);
 
   // 1. Create Users
   const admin = await prisma.user.upsert({

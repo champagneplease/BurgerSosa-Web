@@ -48,6 +48,27 @@ export class CatalogController {
 
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @Post('categories')
+  async createCategory(@Body() data: any) {
+    return this.catalogService.createCategory(data);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Patch('categories/:id')
+  async updateCategory(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
+    return this.catalogService.updateCategory(id, data);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete('categories/:id')
+  async deleteCategory(@Param('id', ParseIntPipe) id: number) {
+    return this.catalogService.deleteCategory(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({

@@ -9,6 +9,7 @@ export class CatalogService {
   async getFullCatalog() {
     return this.prisma.category.findMany({
       where: { isActive: true },
+      orderBy: { order: 'asc' },
       include: {
         products: {
           where: { isActive: true },
@@ -22,6 +23,7 @@ export class CatalogService {
 
   async getAdminCatalog() {
     return this.prisma.category.findMany({
+      orderBy: { order: 'asc' },
       include: {
         products: {
           include: {
@@ -56,6 +58,31 @@ export class CatalogService {
     return this.prisma.product.update({
       where: { id },
       data: { isActive: false }, // Soft delete is safer for e-commerce
+    });
+  }
+
+  async createCategory(data: any) {
+    return this.prisma.category.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        order: data.order ?? 0,
+        isActive: data.isActive ?? true,
+      }
+    });
+  }
+
+  async updateCategory(id: number, data: any) {
+    return this.prisma.category.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteCategory(id: number) {
+    return this.prisma.category.update({
+      where: { id },
+      data: { isActive: false },
     });
   }
 }

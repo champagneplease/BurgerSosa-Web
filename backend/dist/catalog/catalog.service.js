@@ -20,6 +20,7 @@ let CatalogService = class CatalogService {
     async getFullCatalog() {
         return this.prisma.category.findMany({
             where: { isActive: true },
+            orderBy: { order: 'asc' },
             include: {
                 products: {
                     where: { isActive: true },
@@ -32,6 +33,7 @@ let CatalogService = class CatalogService {
     }
     async getAdminCatalog() {
         return this.prisma.category.findMany({
+            orderBy: { order: 'asc' },
             include: {
                 products: {
                     include: {
@@ -61,6 +63,28 @@ let CatalogService = class CatalogService {
     }
     async deleteProduct(id) {
         return this.prisma.product.update({
+            where: { id },
+            data: { isActive: false },
+        });
+    }
+    async createCategory(data) {
+        return this.prisma.category.create({
+            data: {
+                name: data.name,
+                description: data.description,
+                order: data.order ?? 0,
+                isActive: data.isActive ?? true,
+            }
+        });
+    }
+    async updateCategory(id, data) {
+        return this.prisma.category.update({
+            where: { id },
+            data,
+        });
+    }
+    async deleteCategory(id) {
+        return this.prisma.category.update({
             where: { id },
             data: { isActive: false },
         });

@@ -48,7 +48,7 @@ export const useCartStore = create<CartState>((set, get) => ({
         return {
           items: state.items.map(i => 
             i.id === existingItem.id 
-              ? { ...i, quantity: i.quantity + item.quantity } 
+              ? { ...i, quantity: Math.min(6, i.quantity + item.quantity) } 
               : i
           )
         };

@@ -93,4 +93,31 @@ export declare class CatalogService {
         createdAt: Date;
         updatedAt: Date;
     }>;
+    createCategory(data: any): Promise<{
+        id: number;
+        name: string;
+        description: string | null;
+        isActive: boolean;
+        order: number;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    updateCategory(id: number, data: any): Promise<{
+        id: number;
+        name: string;
+        description: string | null;
+        isActive: boolean;
+        order: number;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    deleteCategory(id: number): Promise<{
+        id: number;
+        name: string;
+        description: string | null;
+        isActive: boolean;
+        order: number;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
 }
