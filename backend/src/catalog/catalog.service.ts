@@ -105,9 +105,21 @@ export class CatalogService {
   }
 
   async deleteCategory(id: number) {
-    return this.prisma.category.update({
-      where: { id },
-      data: { isActive: false },
-    });
+    try {
+      await this.prisma.category.delete({
+        where: { id }
+      });
+      return { success: true, message: 'Categoría eliminada permanentemente' };
+    } catch (error: any) {
+      if (error.code === 'P2003') {
+        // Fallback: Si tiene productos asociados, hacemos borrado lógico
+        await this.prisma.category.update({
+          where: { id },
+          data: { isActive: false },
+        });
+        return { success: true, message: 'La categoría tiene productos y fue ocultada' };
+      }
+      throw error;
+    }
   }
 }

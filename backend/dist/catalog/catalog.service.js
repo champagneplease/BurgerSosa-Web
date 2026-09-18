@@ -105,10 +105,22 @@ let CatalogService = class CatalogService {
         });
     }
     async deleteCategory(id) {
-        return this.prisma.category.update({
-            where: { id },
-            data: { isActive: false },
-        });
+        try {
+            await this.prisma.category.delete({
+                where: { id }
+            });
+            return { success: true, message: 'Categoría eliminada permanentemente' };
+        }
+        catch (error) {
+            if (error.code === 'P2003') {
+                await this.prisma.category.update({
+                    where: { id },
+                    data: { isActive: false },
+                });
+                return { success: true, message: 'La categoría tiene productos y fue ocultada' };
+            }
+            throw error;
+        }
     }
 };
 exports.CatalogService = CatalogService;

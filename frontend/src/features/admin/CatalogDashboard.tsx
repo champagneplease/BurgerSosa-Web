@@ -115,6 +115,19 @@ export const CatalogDashboard = () => {
     }
   };
 
+  const handleDeleteCategory = async (id: number) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?')) return;
+    try {
+      await api.delete(`/catalog/categories/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchCatalog();
+    } catch (error) {
+      console.error('Error deleting category', error);
+      alert('Error al eliminar categoría');
+    }
+  };
+
   const toggleProductActive = async (id: number, currentStatus: boolean) => {
     try {
       await api.patch(`/catalog/products/${id}`, { isActive: !currentStatus }, {
@@ -357,13 +370,22 @@ export const CatalogDashboard = () => {
                       <p className="text-xs text-zinc-500">{cat.description}</p>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => handleOpenCatModal(cat)}
-                        className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-colors"
-                        title="Editar Categoría"
-                      >
-                        <Edit2 size={16} />
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleOpenCatModal(cat)}
+                          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-colors"
+                          title="Editar Categoría"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteCategory(cat.id)}
+                          className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                          title="Eliminar Categoría permanentemente"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

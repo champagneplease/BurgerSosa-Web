@@ -112,12 +112,7 @@ export declare class CatalogService {
         updatedAt: Date;
     }>;
     deleteCategory(id: number): Promise<{
-        id: number;
-        name: string;
-        description: string | null;
-        isActive: boolean;
-        order: number;
-        createdAt: Date;
-        updatedAt: Date;
+        success: boolean;
+        message: string;
     }>;
 }
