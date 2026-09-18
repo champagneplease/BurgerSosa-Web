@@ -99,7 +99,7 @@ function LandingPage() {
               <Menu size={24} />
             </button>
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-              <img src="/logo.png" alt="BurgerSosa Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+              <img src="/logo.svg" alt="BurgerSosa Logo" className="w-10 h-10 object-contain drop-shadow-md" />
               <h1 className="text-xl font-black tracking-tighter uppercase text-white hidden sm:block">Burger<span className="text-amber-500">Sosa</span></h1>
             </div>
           </div>
@@ -131,7 +131,7 @@ function LandingPage() {
           <div className="w-64 bg-zinc-900 h-full border-r border-zinc-800 relative z-50 animate-in slide-in-from-left p-6 flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+                <img src="/logo.svg" alt="Logo" className="w-8 h-8 object-contain" />
                 <span className="font-black text-lg">Burger<span className="text-amber-500">Sosa</span></span>
               </div>
               <button onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400">
@@ -233,7 +233,7 @@ function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src="/logo.png" alt="BurgerSosa Logo" className="w-8 h-8 object-contain" />
+              <img src="/logo.svg" alt="BurgerSosa Logo" className="w-8 h-8 object-contain" />
               <h2 className="text-2xl font-black uppercase">Burger<span className="text-amber-500">Sosa</span></h2>
             </div>
             <p className="text-zinc-400 text-sm leading-relaxed mb-6">
