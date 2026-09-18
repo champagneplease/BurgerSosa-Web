@@ -52,6 +52,27 @@ async function bootstrap() {
             console.log('Admin password migrated successfully.');
         }
     }
+    const burgerCategories = await prisma.category.findMany();
+    const burgerCategoryIds = burgerCategories
+        .filter(c => c.name.toLowerCase().includes('hamburguesa'))
+        .map(c => c.id);
+    if (burgerCategoryIds.length > 0) {
+        const productsWithoutModifiers = await prisma.product.findMany({
+            where: {
+                categoryId: { in: burgerCategoryIds },
+                modifiers: { none: {} }
+            }
+        });
+        for (const p of productsWithoutModifiers) {
+            await prisma.modifier.createMany({
+                data: [
+                    { name: 'Medallón Extra', price: 2000, productId: p.id, isActive: true },
+                    { name: 'Sin Cebolla', price: 0, productId: p.id, isActive: true }
+                ]
+            });
+            console.log(`Synced default modifiers for existing product ${p.name}`);
+        }
+    }
     app.setGlobalPrefix('api');
     app.enableCors({
         origin: (origin, callback) => {
