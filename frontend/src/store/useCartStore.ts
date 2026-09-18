@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export interface Modifier {
   id: number;
@@ -33,7 +34,9 @@ interface CartState {
   getTotal: () => number;
 }
 
-export const useCartStore = create<CartState>((set, get) => ({
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
   items: [],
   addItem: (item) => {
     set((state) => {
@@ -69,4 +72,9 @@ export const useCartStore = create<CartState>((set, get) => ({
   getTotal: () => {
     return get().items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0);
   },
-}));
+}),
+    {
+      name: 'burgersosa-cart',
+    }
+  )
+);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from './services/api';
+import { getImageUrl } from './utils/imageUrl';
 import { useCartStore } from './store/useCartStore';
 import type { Product } from './store/useCartStore';
 import { CategorySection } from './features/catalog/CategorySection';
@@ -316,7 +317,7 @@ function LandingPage() {
                       <X size={14} />
                     </button>
                     <div className="w-16 h-16 bg-zinc-800 rounded-xl flex items-center justify-center text-2xl flex-shrink-0">
-                      {item.product.image ? <img src={item.product.image} alt={item.product.name} className="w-full h-full object-cover rounded-xl" /> : '🍔'}
+                      {item.product.image ? <img src={getImageUrl(item.product.image)} alt={item.product.name} className="w-full h-full object-cover rounded-xl" /> : '🍔'}
                     </div>
                     <div className="flex-1">
                       <h4 className="font-bold text-white">{item.product.name}</h4>
