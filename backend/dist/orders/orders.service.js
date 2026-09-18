@@ -26,7 +26,7 @@ let OrdersService = class OrdersService {
             throw new common_1.BadRequestException('Order must contain at least one item');
         }
         let subtotal = 0;
-        const deliveryCost = data.type === 'DELIVERY' ? 500 : 0;
+        const deliveryCost = 0;
         const orderItems = [];
         for (const item of data.items) {
             if (item.quantity > 6) {
@@ -84,6 +84,7 @@ let OrdersService = class OrdersService {
                 subtotal,
                 deliveryCost,
                 total,
+                paymentMethod: data.paymentMethod,
                 status: client_1.OrderStatus.PENDING,
                 items: {
                     create: orderItems

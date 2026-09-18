@@ -32,7 +32,23 @@ export const formatOrderForWhatsApp = (order: any, phoneNumber: string) => {
   });
 
   message += `\n------------------------\n`;
-  message += `*TOTAL A PAGAR:* $${Number(order.total).toLocaleString('es-AR')}\n`;
+  message += `*TOTAL DEL PEDIDO:* $${Number(order.subtotal).toLocaleString('es-AR')}\n`;
+  
+  if (order.type === 'DELIVERY') {
+    message += `*ENVÍO:* A confirmar según ubicación\n`;
+  }
+  
+  if (order.paymentMethod === 'EFECTIVO') {
+    message += `*MÉTODO DE PAGO:* Efectivo\n`;
+  } else if (order.paymentMethod === 'TRANSFERENCIA') {
+    if (order.type === 'DELIVERY') {
+      message += `*MÉTODO DE PAGO:* Transferencia (Esperando total final)\n`;
+    } else {
+      message += `*MÉTODO DE PAGO:* Transferencia\n`;
+      message += `_(Te enviaré el comprobante de pago por aquí)_\n`;
+    }
+  }
+
   message += `------------------------\n\n`;
   message += `Este pedido fue generado desde la web.`;
 

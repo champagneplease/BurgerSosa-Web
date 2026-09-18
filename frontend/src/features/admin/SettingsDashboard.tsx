@@ -26,6 +26,7 @@ export const SettingsDashboard = () => {
   const [openTime, setOpenTime] = useState('20:00');
   const [closeTime, setCloseTime] = useState('00:00');
   const [closedMessage, setClosedMessage] = useState('');
+  const [paymentAlias, setPaymentAlias] = useState('');
   const [scheduleDays, setScheduleDays] = useState<string[]>([]);
 
   useEffect(() => {
@@ -38,6 +39,7 @@ export const SettingsDashboard = () => {
         setOpenTime(data.openTime || '20:00');
         setCloseTime(data.closeTime || '00:00');
         setClosedMessage(data.closedMessage || '');
+        setPaymentAlias(data.paymentAlias || '');
         if (data.scheduleDays) {
           setScheduleDays(data.scheduleDays.split(','));
         }
@@ -67,6 +69,7 @@ export const SettingsDashboard = () => {
         openTime,
         closeTime,
         closedMessage,
+        paymentAlias,
         scheduleDays: scheduleDays.join(',')
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -211,6 +214,20 @@ export const SettingsDashboard = () => {
                   placeholder="0.00"
                 />
                 <p className="text-xs text-zinc-500 mt-2">Se sumará al total si eligen "Delivery".</p>
+              </div>
+              
+              <div className="md:col-span-2 mt-4 pt-4 border-t border-zinc-800">
+                <label className="block text-zinc-400 text-sm font-medium mb-2">
+                  Alias para Transferencias (CBU/CVU/Alias)
+                </label>
+                <input 
+                  type="text"
+                  value={paymentAlias}
+                  onChange={(e) => setPaymentAlias(e.target.value)}
+                  className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-amber-500 transition-all font-mono"
+                  placeholder="BURGERSOSA.MP"
+                />
+                <p className="text-xs text-zinc-500 mt-2">Este alias se mostrará al cliente al elegir "Transferencia".</p>
               </div>
             </div>
           </div>

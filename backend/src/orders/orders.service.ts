@@ -16,7 +16,7 @@ export class OrdersService {
     }
 
     let subtotal = 0;
-    const deliveryCost = data.type === 'DELIVERY' ? 500 : 0; // Fixed delivery cost for now
+    const deliveryCost = 0; // Dynamic cost to be added later by the admin
     const orderItems = [];
 
     for (const item of data.items) {
@@ -83,6 +83,7 @@ export class OrdersService {
         subtotal,
         deliveryCost,
         total,
+        paymentMethod: data.paymentMethod,
         status: OrderStatus.PENDING,
         items: {
           create: orderItems

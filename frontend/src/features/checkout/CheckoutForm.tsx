@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, MapPin, Store, Send, Crosshair } from 'lucide-react';
+import { X, MapPin, Store, Send, Crosshair, Banknote, CreditCard } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { api } from '../../services/api';
 import { formatOrderForWhatsApp } from '../../utils/whatsapp';
@@ -16,6 +16,16 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onClose }) => {
   const [locationLoading, setLocationLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'EFECTIVO' | 'TRANSFERENCIA'>('EFECTIVO');
+  const [paymentAlias, setPaymentAlias] = useState('');
+
+  React.useEffect(() => {
+    api.get('/settings').then(res => {
+      if (res.data?.paymentAlias) {
+        setPaymentAlias(res.data.paymentAlias);
+      }
+    }).catch(console.error);
+  }, []);
 
   const cartItems = useCartStore((state) => state.items);
   const cartTotal = useCartStore((state) => state.getTotal());
@@ -58,6 +68,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onClose }) => {
         customerName: name,
         customerPhone: phone,
         type: type,
+        paymentMethod: paymentMethod,
         deliveryAddress: type === 'DELIVERY' ? address : null,
         items: cartItems.map(item => ({
           productId: item.product.id,
@@ -198,6 +209,45 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onClose }) => {
                 </div>
               </div>
             )}
+
+            <div className="pt-2 border-t border-zinc-800">
+              <label className="block text-zinc-400 text-sm font-medium mb-2">Método de pago</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('EFECTIVO')}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${paymentMethod === 'EFECTIVO' ? 'border-amber-500 bg-amber-500/10 text-amber-500' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600'}`}
+                >
+                  <Banknote size={24} className="mb-2" />
+                  <span className="font-semibold">Efectivo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('TRANSFERENCIA')}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all ${paymentMethod === 'TRANSFERENCIA' ? 'border-amber-500 bg-amber-500/10 text-amber-500' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600'}`}
+                >
+                  <CreditCard size={24} className="mb-2" />
+                  <span className="font-semibold">Transferencia</span>
+                </button>
+              </div>
+            </div>
+
+            {paymentMethod === 'TRANSFERENCIA' && (
+              <div className="animate-in fade-in slide-in-from-top-2">
+                {type === 'DELIVERY' ? (
+                  <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
+                    <p className="text-amber-500 font-medium text-sm mb-1">Costo de envío a confirmar 📍</p>
+                    <p className="text-zinc-400 text-sm mt-2">Por favor <strong>no transfieras todavía</strong>. Envía el pedido y te confirmaremos el costo exacto del envío a tu ubicación junto con el Alias por WhatsApp.</p>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
+                    <p className="text-amber-500 font-medium text-sm mb-1">Transferir al Alias / CVU:</p>
+                    <p className="text-white font-mono font-bold text-lg select-all">{paymentAlias || 'No configurado'}</p>
+                    <p className="text-zinc-400 text-xs mt-2">No olvides enviar el comprobante de pago por WhatsApp.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </form>
         </div>
 
@@ -214,7 +264,13 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onClose }) => {
                <>Enviar Pedido por WhatsApp <Send size={18} /></>
              )}
            </button>
-           <p className="text-center text-zinc-500 text-xs mt-3">Total a pagar: ${cartTotal.toLocaleString('es-AR')}</p>
+           <p className="text-center text-zinc-500 text-xs mt-3">
+             {type === 'DELIVERY' ? (
+               <>Total parcial: ${cartTotal.toLocaleString('es-AR')} <span className="text-amber-500/80">(+ envío a confirmar)</span></>
+             ) : (
+               `Total a pagar: $${cartTotal.toLocaleString('es-AR')}`
+             )}
+           </p>
         </div>
       </div>
     </div>

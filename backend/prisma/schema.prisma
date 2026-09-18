@@ -191,5 +191,6 @@ model StoreSettings {
   closedMessage  String   @default("Hoy no abrimos, los esperamos en nuestro próximo día hábil con las mejores hamburguesas del Valle.")
   whatsappNumber String   @default("5493834974026")
   deliveryCost   Decimal  @default(500) @db.Decimal(10, 2)
+  paymentAlias   String   @default("")
   updatedAt      DateTime @updatedAt
 }
