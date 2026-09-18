@@ -19,12 +19,15 @@ export const CategorySection: React.FC<CategorySectionProps> = ({ category, onPr
 
   return (
     <section className="py-8 scroll-mt-24" id={`category-${category.id}`}>
-      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">
-        {category.name}
-      </h2>
-      {category.description && (
-        <p className="text-zinc-400 mb-6">{category.description}</p>
-      )}
+      <div className="mb-6">
+        <h2 className="text-4xl font-bold text-brand-light mb-2 tracking-tight capitalize">
+          {category.name}
+        </h2>
+        <div className="h-1 w-12 bg-brand-accent rounded-full mb-3"></div>
+        {category.description && (
+          <p className="text-brand-light/60">{category.description}</p>
+        )}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
         {category.products.map(product => (
           <ProductCard key={product.id} product={product} onClick={onProductClick} />
