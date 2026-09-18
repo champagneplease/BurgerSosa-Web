@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
 import { getImageUrl } from '../../utils/imageUrl';
 import { useAuthStore } from '../../store/useAuthStore';
-import { Plus, Edit2, Tag, EyeOff, Eye, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Edit2, Tag, EyeOff, Eye, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 
 export const CatalogDashboard = () => {
   const [activeTab, setActiveTab] = useState<'products' | 'categories'>('products');
@@ -98,6 +98,20 @@ export const CatalogDashboard = () => {
     } catch (error) {
       console.error('Error saving product:', error);
       alert('Error al guardar el producto.');
+    }
+  };
+
+  
+  const handleDeleteProduct = async (id: number) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este producto de forma permanente?')) return;
+    try {
+      await api.delete(`/catalog/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchCatalog();
+    } catch (error: any) {
+      console.error('Error deleting product:', error);
+      alert(error.response?.data?.message || 'Error al eliminar el producto');
     }
   };
 
@@ -293,6 +307,14 @@ export const CatalogDashboard = () => {
                         >
                           <Edit2 size={16} />
                         </button>
+                      <button 
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="Eliminar Producto permanentemente"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+
                       </div>
                     </td>
                   </tr>

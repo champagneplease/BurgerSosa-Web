@@ -44,7 +44,7 @@ let CatalogService = class CatalogService {
         });
     }
     async createProduct(data) {
-        return this.prisma.product.create({
+        const product = await this.prisma.product.create({
             data: {
                 name: data.name,
                 description: data.description,
@@ -54,6 +54,18 @@ let CatalogService = class CatalogService {
                 isActive: data.isActive ?? true,
             }
         });
+        const category = await this.prisma.category.findUnique({
+            where: { id: data.categoryId }
+        });
+        if (category && category.name.toLowerCase().includes('hamburguesa')) {
+            await this.prisma.modifier.createMany({
+                data: [
+                    { name: 'Medallón Extra', price: 2000, productId: product.id, isActive: true },
+                    { name: 'Sin Cebolla', price: 0, productId: product.id, isActive: true }
+                ]
+            });
+        }
+        return product;
     }
     async updateProduct(id, data) {
         return this.prisma.product.update({
@@ -62,10 +74,19 @@ let CatalogService = class CatalogService {
         });
     }
     async deleteProduct(id) {
-        return this.prisma.product.update({
-            where: { id },
-            data: { isActive: false },
-        });
+        try {
+            await this.prisma.modifier.deleteMany({ where: { productId: id } });
+            await this.prisma.recipeItem.deleteMany({ where: { productId: id } });
+            return await this.prisma.product.delete({
+                where: { id },
+            });
+        }
+        catch (error) {
+            if (error.code === 'P2003') {
+                throw new common_1.BadRequestException('No se puede eliminar este producto porque ya tiene pedidos asociados. Por favor, ocúltalo/páusalo en su lugar.');
+            }
+            throw error;
+        }
     }
     async createCategory(data) {
         return this.prisma.category.create({

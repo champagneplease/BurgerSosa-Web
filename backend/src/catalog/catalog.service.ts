@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Product, Category } from '@prisma/client';
 
@@ -35,7 +35,7 @@ export class CatalogService {
   }
 
   async createProduct(data: any) {
-    return this.prisma.product.create({
+    const product = await this.prisma.product.create({
       data: {
         name: data.name,
         description: data.description,
@@ -45,6 +45,21 @@ export class CatalogService {
         isActive: data.isActive ?? true,
       }
     });
+
+    const category = await this.prisma.category.findUnique({
+      where: { id: data.categoryId }
+    });
+
+    if (category && category.name.toLowerCase().includes('hamburguesa')) {
+      await this.prisma.modifier.createMany({
+        data: [
+          { name: 'Medallón Extra', price: 2000, productId: product.id, isActive: true },
+          { name: 'Sin Cebolla', price: 0, productId: product.id, isActive: true }
+        ]
+      });
+    }
+
+    return product;
   }
 
   async updateProduct(id: number, data: any) {
@@ -55,10 +70,20 @@ export class CatalogService {
   }
 
   async deleteProduct(id: number) {
-    return this.prisma.product.update({
-      where: { id },
-      data: { isActive: false }, // Soft delete is safer for e-commerce
-    });
+    try {
+      // Intentar borrado físico
+      await this.prisma.modifier.deleteMany({ where: { productId: id } });
+      await this.prisma.recipeItem.deleteMany({ where: { productId: id } });
+      
+      return await this.prisma.product.delete({
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2003') {
+        throw new BadRequestException('No se puede eliminar este producto porque ya tiene pedidos asociados. Por favor, ocúltalo/páusalo en su lugar.');
+      }
+      throw error;
+    }
   }
 
   async createCategory(data: any) {
