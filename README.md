@@ -1,46 +1,90 @@
-# BurgerSosa
+# BurgerSosa Web 🍔
 
-Plataforma full-stack para BurgerSosa.
+Plataforma full-stack diseñada específicamente para el restaurante BurgerSosa. Este sistema digitaliza y automatiza todo el proceso de toma de pedidos, reemplazando el antiguo modelo manual por una solución moderna, estética e integrada con WhatsApp.
 
-## Despliegue en Producción (Railway)
+## 🚀 Problemas que soluciona
 
-El proyecto está preparado para ser desplegado en un único proyecto de Railway como un monorepo que contiene el frontend, el backend y la base de datos PostgreSQL.
+Antes, los pedidos se tomaban manualmente, lo que generaba pérdida de tiempo, errores en las comandas y cuellos de botella en horas pico. BurgerSosa Web soluciona esto ofreciendo:
 
-### Arquitectura en Railway
+- **Catálogo Digital Autogestionable:** Los clientes pueden ver todos los productos actualizados en tiempo real sin necesidad de preguntar precios ni stock.
+- **Carrito de Compras Persistente:** Los usuarios pueden armar su pedido a su ritmo. El sistema recuerda su carrito incluso si cierran la página por accidente (gracias a la persistencia en `localStorage`).
+- **Control Automático de Stock e Inventario:** Cada hamburguesa vendida descuenta automáticamente los ingredientes (pan, carne, queso, etc.) del inventario del local.
+- **Pedidos Directos por WhatsApp:** Al finalizar la compra, el sistema estructura un mensaje claro y detallado (cantidades, modificaciones, método de pago, envío) y lo envía directamente al WhatsApp del local, eliminando ambigüedades.
+- **Panel de Administrador Seguro:** Un backoffice protegido con JWT donde el dueño puede crear/editar productos, gestionar categorías, configurar horarios de apertura y alias bancarios, sin tocar una línea de código.
+
+## 💻 Tecnologías Utilizadas
+
+Este proyecto utiliza un stack moderno y escalable (PERN modificado con Prisma y NestJS):
+
+### Frontend
+- **React.js (Vite)**: Interfaz de usuario rápida y reactiva.
+- **TailwindCSS**: Estilizado moderno, responsivo y modo oscuro nativo.
+- **Zustand**: Gestión del estado global (carrito de compras, autenticación).
+- **Lucide React**: Sistema de iconografía ligera.
+
+### Backend
+- **NestJS**: Framework backend en Node.js, estructurado y escalable.
+- **Prisma ORM**: Modelado y consultas seguras a la base de datos.
+- **PostgreSQL**: Base de datos relacional robusta.
+- **JWT (JSON Web Tokens)**: Autenticación segura para el panel administrativo.
+
+## ⚙️ Instalación Local
+
+Para correr el proyecto en tu máquina local, necesitarás **Node.js (v18+)** y **Docker** (para levantar la base de datos).
+
+### 1. Clonar el repositorio e instalar dependencias
+```bash
+git clone https://github.com/champagneplease/BurgerSosa-Web.git
+cd BurgerSosa-Web
+
+# Instalar dependencias del backend
+cd backend
+npm install
+
+# Instalar dependencias del frontend
+cd ../frontend
+npm install
 ```
-Railway Project
-├── PostgreSQL
-├── Backend
-└── Frontend
+
+### 2. Levantar la Base de Datos Local
+En la raíz del proyecto, ejecuta Docker Compose para levantar PostgreSQL:
+```bash
+docker-compose up -d
 ```
 
-### Pasos Exactos de Despliegue
+### 3. Configurar Variables de Entorno
+Crea un archivo `.env` en la carpeta `backend/` con el siguiente contenido:
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/burgersosa?schema=public"
+JWT_SECRET="tu_secreto_local_aqui"
+FRONTEND_URL="http://localhost:5173"
+PORT=3000
+```
 
-1. **PostgreSQL (Paso 1)**
-   - Ingresa a tu dashboard de Railway y selecciona `New Project`.
-   - Selecciona `Provision PostgreSQL`.
-   - Una vez creado, ve a la pestaña `Variables` del servicio Postgres para visualizar la `DATABASE_URL` (la necesitarás en el siguiente paso).
+Crea un archivo `.env` en la carpeta `frontend/` con el siguiente contenido:
+```env
+VITE_API_URL="http://localhost:3000/api"
+```
 
-2. **Backend (Paso 2)**
-   - En el mismo proyecto de Railway, haz clic en `New` -> `GitHub Repo` y selecciona este repositorio.
-   - Ve a `Settings` del nuevo servicio recién creado.
-   - En la sección **Root Directory**, ingresa `/backend`.
-   - Ve a la pestaña `Variables` y agrega las siguientes:
-     - `DATABASE_URL`: Pega el valor obtenido de tu servicio PostgreSQL (Railway puede sugerírtelo automáticamente con un botón `Reference Variable`).
-     - `JWT_SECRET`: Ingresa una frase secreta segura para cifrar las sesiones del panel de administrador.
-     - `FRONTEND_URL`: (Ej. `https://burgersosa-frontend.up.railway.app` o tu dominio personalizado). Dejar pendiente hasta crear el frontend o completarlo después.
-   - Ve a la pestaña `Networking` y pulsa **Generate Domain** (Este será tu dominio de Backend).
-   - *Nota:* El Dockerfile del backend ya está configurado para ejecutar automáticamente `npx prisma migrate deploy` antes de arrancar la aplicación, por lo que tus tablas se crearán solas en la base de datos.
+### 4. Inicializar Base de Datos y Correr el Proyecto
+En la carpeta `backend/`, ejecuta las migraciones para crear las tablas y corre el servidor:
+```bash
+cd backend
+npx prisma migrate dev
+npm run start:dev
+```
 
-3. **Frontend (Paso 3)**
-   - Haz clic nuevamente en `New` -> `GitHub Repo` y selecciona este repositorio.
-   - Ve a `Settings` y en **Root Directory**, ingresa `/frontend`.
-   - Ve a la pestaña `Variables` y agrega:
-     - `VITE_API_URL`: Pega el dominio público que generaste para el Backend en el paso 2 (Ej. `https://burgersosa-backend.up.railway.app/api`). Es **crítico** cargar esta variable antes de que finalice el despliegue del frontend, ya que se inyecta durante el *build*.
-   - Ve a `Networking` y pulsa **Generate Domain** (Este será el dominio visible para los clientes).
-   - Vuelve a las variables del Backend (Paso 2) y asegúrate de que `FRONTEND_URL` coincida con este nuevo dominio para habilitar el CORS correctamente.
+En otra terminal, corre el frontend:
+```bash
+cd frontend
+npm run dev
+```
+La página estará disponible en `http://localhost:5173`.
 
-### Comprobación del Despliegue
-- Visita el dominio público del frontend y verifica que la página cargue.
-- Visita `https://TU_DOMINIO_BACKEND/health` y deberías ver el estado `{"status":"ok"}`.
-- Ingresa a `/admin` en el frontend, inicia sesión, y crea un producto de prueba. Si se muestra en el menú público, ¡todo funciona perfecto!
+## ☁️ Despliegue en Producción (Railway)
+
+Este monorepo está optimizado para desplegarse fácilmente en **Railway.app**.
+
+1. **PostgreSQL:** Crea un servicio PostgreSQL en Railway y obtén su `DATABASE_URL`.
+2. **Backend:** Despliega la carpeta `/backend`. Configura en sus variables: `DATABASE_URL`, `JWT_SECRET`, y `FRONTEND_URL`. (Las migraciones de Prisma correrán automáticamente en el build). Genera su dominio público.
+3. **Frontend:** Despliega la carpeta `/frontend`. Configura en sus variables: `VITE_API_URL` apuntando al dominio del backend. Genera su dominio público.
